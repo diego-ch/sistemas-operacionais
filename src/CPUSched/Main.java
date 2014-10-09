@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 public class Main {
 
-	public static final boolean verbose = true;
+	public static final int verbose = 1;
 	
 	public static void  printUsage() {
 		System.out.println("\n\nUso:\tjava CPUSched.Main arquivo.txt\n\tjava CPUSched.Main < arquivo.txt");
@@ -38,7 +38,7 @@ public class Main {
 				
 				File inputfile = new File(args[0]);
 				
-				if (verbose){
+				if (verbose > 1){
 					System.out.println("cpusched: arquivo '" + inputfile.getName() + "' selecionado");
 				}
 				
@@ -53,7 +53,7 @@ public class Main {
 		// ler da entrada padrão se não forem passados argumentos
 		if (args.length == 0) {
 			
-			if (verbose){
+			if (verbose > 1){
 				System.out.println("cpusched: entrada padrão selecionada");
 			}
 			inputlist = new Scanner(System.in);
@@ -67,7 +67,7 @@ public class Main {
 		
 		// passando arquivo/stdin para a memória		
 		if (inputlist.hasNextLine()) {
-			if (verbose){
+			if (verbose > 1){
 				System.out.println("cpusched: lendo lista de processos...");
 			}
 	        while (inputlist.hasNext()) {
@@ -85,13 +85,18 @@ public class Main {
 		
 		inputlist.close();
 		
-		if (verbose) {
+		// exibe a lista de processos dada como entrada
+		if (verbose > 1) {
 			for (int i = 0; i < process_list.size(); i++)
 				System.out.println("\t"+process_list.get(i).toString());
 		}
 		
 		
-		if (verbose){
+		// executa os métodos de escalonamento
+		Schedulers.runFCFS(process_list);
+		
+		
+		if (verbose > 1){
 			System.out.println("cpusched: finalizado");
 		}
 		return;
