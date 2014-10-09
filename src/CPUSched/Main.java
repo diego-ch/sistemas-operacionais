@@ -13,13 +13,14 @@ import java.util.Scanner;
 
 public class Main {
 
-	public static final int verbose = 1;
+	public static final int verbose = 0;
 	
 	public static void  printUsage() {
 		System.out.println("\n\nUso:\tjava CPUSched.Main arquivo.txt\n\tjava CPUSched.Main < arquivo.txt");
 	}
 	
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 
 		Scanner inputlist = null;
@@ -60,8 +61,6 @@ public class Main {
 			
 		}
 		
-
-		Process process;
 		int pid=0, burstTime, submissionTime;
 		LinkedList<Process> process_list = new LinkedList();
 		
@@ -73,8 +72,7 @@ public class Main {
 	        while (inputlist.hasNext()) {
 	            submissionTime = inputlist.nextInt();
 	            burstTime = inputlist.nextInt();
-	            process = new Process(pid, submissionTime, burstTime);
-	            process_list.add(process);
+	            process_list.add(new Process(pid, submissionTime, burstTime));
 	            pid++;
 	        }
 	        
