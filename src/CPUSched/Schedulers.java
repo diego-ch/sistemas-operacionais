@@ -5,15 +5,16 @@ import java.util.ListIterator;
 
 public class Schedulers {
 
+	// FCFS Implementation - First Come, First Served
 	@SuppressWarnings("unused")
-	public static void runFCFS(LinkedList<Process> inputlist){
-
-		double fcfs_turnaround = 0, fcfs_reply = 0, fcfs_awaiting = 0;
+	public static void runFCFS(LinkedList<Process> processlist){
 
 		int timer=0, count=0;
+		double fcfs_turnaround = 0, fcfs_reply = 0, fcfs_awaiting = 0;
 
+		LinkedList<Process> inputlist = (LinkedList) processlist.clone();
+		ListIterator<Process> iter    = inputlist.listIterator();
 		
-		ListIterator<Process> iter = inputlist.listIterator();
 		Process process = iter.next();
 		
 		while(!inputlist.isEmpty()) {
@@ -33,7 +34,7 @@ public class Schedulers {
 			process.setReplyTime(timer);
 			timerAux = timer + process.getBurstTime();
 
-			if (Main.verbose > 0) {
+			if (Main.verbose > -1) {
 				System.out.println("Rodando Processo [" + process.getPID() + "] de [" + timer + "] até [" + timerAux + "]");
 			}
 
@@ -61,6 +62,5 @@ public class Schedulers {
 
 		System.out.println("FCFS " + fcfs_turnaround/count + " " + fcfs_reply/count + " " + fcfs_awaiting/count);
 	}
-
 
 }

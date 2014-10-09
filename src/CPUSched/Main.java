@@ -92,6 +92,7 @@ public class Main {
 		
 		// executa os métodos de escalonamento
 		Schedulers.runFCFS(process_list);
+		//Schedulers.runSJF(process_list);
 		
 		
 		if (verbose > 1){
