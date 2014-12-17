@@ -13,13 +13,12 @@ public class Tools {
 	}
 	
 	
-	
-	// leitor de entrada
+	// método leitor de entrada
+	// copia os dados do STDIN ou de um Arquivo e retorna para o programa um ArrayList com os dados
 	public static ArrayList<String> getInput(Scanner input){
 		
 		ArrayList<String> list = new ArrayList<String> ();
 
-		// passando arquivo/stdin para a memória		
 		if (input.hasNextLine()) {
 	        while (input.hasNext()) {
 	            list.add(Integer.toString(input.nextInt()));
@@ -28,7 +27,8 @@ public class Tools {
 			System.err.println("pagerep: erro: lista de processos vazia");
 			return null;
 		}
-		
 		return list;
 	}
+	
+	
 }
