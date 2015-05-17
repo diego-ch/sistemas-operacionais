@@ -1,73 +1,138 @@
 package CPUSched;
 
 import java.text.NumberFormat;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ListIterator;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Schedulers {
 
-	// FCFS Implementation - First Come, First Served
-	@SuppressWarnings("unused")
-	public static void runFCFS(LinkedList<Process> processlist){
+    //
+    // Log
+    //
 
-		int timer=0, count=0;
-		double fcfs_turnaround = 0, fcfs_reply = 0, fcfs_awaiting = 0;
+    private final static Logger LOGGER = Logger.getLogger(Schedulers.class.getName());
 
-		Locale fmtLocale = new Locale("pt", "BR");
-		NumberFormat formatter = NumberFormat.getInstance(fmtLocale);
-		formatter.setMaximumFractionDigits(1);
-		formatter.setMinimumFractionDigits(1);
+    //
+    // rewrite output with pt_BR locale
+    //
 
-		LinkedList<Process> inputlist = (LinkedList) processlist.clone();
-		ListIterator<Process> iter    = inputlist.listIterator();
-		
-		Process process = iter.next();
-		
-		while(!inputlist.isEmpty()) {
+    private static String format_output(double output) {
 
-			int timerAux;
+        Locale fmtLocale = new Locale("pt", "BR");
+        NumberFormat formatter = NumberFormat.getInstance(fmtLocale);
 
-			// espera o timer alcançar o primeiro processo da lista
-			if (process.getSubmissionTime() > timer) {
-				if (Main.verbose > 1) {
-					System.out.println("cpusched: aguardando entrada de processos");
-				}
-				timer++;
-				continue;
-			}
-			
-			// simula execução do primeiro processo
-			process.setReplyTime(timer);
-			timerAux = timer + process.getBurstTime();
+        formatter.setMaximumFractionDigits(1);
+        formatter.setMinimumFractionDigits(1);
 
-			if (Main.verbose > 0) {
-				System.out.println("Rodar processo [" + process.getPID() + "] de [" + timer + "] ate [" + timerAux + "]");
-			}
+        return formatter.format(output);
+    }
 
-			timer += process.getBurstTime();
+    //
+    // FCFS Implementation - First Come, First Served
+    //
+    public static void runFCFS(ArrayList<Process> process_list) {
 
-			// atribui os valores de retorno/resposta/espera do processo para gerar media do algoritmo posteriormente
-			fcfs_turnaround += timer - process.getSubmissionTime();
-			fcfs_reply      += process.getReplyTime() - process.getSubmissionTime();
-			fcfs_awaiting   += process.getReplyTime() - process.getSubmissionTime();
+        LOGGER.setLevel(Level.ALL);
 
-			if (Main.verbose > 1) {
-				System.out.println("cpusched: removendo processo[" + process.getPID() + "] da lista...");
-			}
+        int clock = -1;
+        int count = 0;
 
-			// recebe proximo processo da lista e remove o atual
-			if (iter.hasNext()) {
-				process = iter.next();
-				iter.remove();
-			} else {
-				inputlist.removeFirst();
-			}
-			
-			count++;
-		}
+        double fcfs_turnaround = 0;
+        double fcfs_reply      = 0;
+        double fcfs_awaiting   = 0;
 
-		System.out.println("FCFS " + formatter.format(fcfs_turnaround/count) + " " + formatter.format(fcfs_reply/count) + " " + formatter.format(fcfs_awaiting/count));
-	}
+        ListIterator<Process> iter = process_list.listIterator();
+        Process process = iter.next();
+
+        while (true) {
+
+            clock++;
+            //System.out.println("clock: " + clock + " count: " + count);
+
+            // wait until clock reaches the first process in the list
+            if (process.getSubmissionTimestamp() > clock) {
+                //LOGGER.log(Level.FINE, "cpusched: waiting processes");
+                continue;
+            }
+
+            process.setReplyTimestamp(clock);
+            //System.out.println("cpusched: run process [" + process.getPID() + "] from [" + clock + "] until [" + (clock+process.getBurstDuration()-1) + "]");
+            clock += process.getBurstDuration() - 1;
+
+            // write process turnaround, reply and awaiting times
+            fcfs_turnaround += clock - process.getSubmissionTimestamp() + 1;
+            fcfs_reply      += process.getReplyTimestamp() - process.getSubmissionTimestamp();
+            fcfs_awaiting   += process.getReplyTimestamp() - process.getSubmissionTimestamp();
+            //System.out.println(fcfs_turnaround +" "+ fcfs_reply+" "+fcfs_awaiting);
+
+            count++;
+
+            if (iter.hasNext())
+                process = iter.next();
+            else
+                break;
+        }
+
+        System.out.println("FCFS " + format_output(fcfs_turnaround/count) + " " + format_output(fcfs_reply/count) + " " + format_output(fcfs_awaiting/count));
+    }
+
+    public static void runSJF(ArrayList<Process> process_list) {
+
+
+        LOGGER.setLevel(Level.ALL);
+
+        int clock = -1;
+        int count = 0;
+
+        double sjf_turnaround = 0;
+        double sjf_reply      = 0;
+        double sjf_awaiting   = 0;
+
+        ArrayList<Process> processesSortedByDuration = new ArrayList<Process>();
+        processesSortedByDuration.addAll(process_list);
+        Process process = processesSortedByDuration.get(1);
+
+        while (true) {
+
+            clock++;
+            System.out.println("\nclock: " + clock + " count: " + count);
+            System.out.println("ordered_list " + processesSortedByDuration.toString());
+
+            // wait until clock reaches the first process in the list
+            if (process.getSubmissionTimestamp() > clock) {
+                System.out.println("cpusched: waiting processes");
+                continue;
+            }
+
+            process.setReplyTimestamp(clock);
+            System.out.println("cpusched: run process [" + process.getPID() + "] from [" + clock + "] until [" + (clock + process.getBurstDuration() - 1) + "]");
+            clock += process.getBurstDuration()-1;
+
+            // write process turnaround, reply and awaiting times
+            sjf_turnaround += clock - process.getSubmissionTimestamp()+1;
+            sjf_reply += process.getReplyTimestamp() - process.getSubmissionTimestamp();
+            sjf_awaiting += process.getReplyTimestamp() - process.getSubmissionTimestamp();
+            System.out.println("\n\tprocess_submission: " + process.getSubmissionTimestamp() + "\t\t process_burst: " + process.getBurstDuration()
+                      + "\n\ttotal_turnaround: " + sjf_turnaround + "\t\t process_turnaround: " + (clock - process.getSubmissionTimestamp()+1)
+                      + "\n\ttotal_reply: "      + sjf_reply      + "\t\t process_reply: "      + (process.getReplyTimestamp() - process.getSubmissionTimestamp())
+                      + "\n\ttotal_awaiting: "   + sjf_awaiting   + "\t\t process_awaiting: "   + (process.getReplyTimestamp() - process.getSubmissionTimestamp()));
+
+            count++;
+
+            processesSortedByDuration.remove(0);
+            if (processesSortedByDuration.isEmpty())
+                break;
+
+            Collections.sort(processesSortedByDuration);
+            process = processesSortedByDuration.get(0);
+        }
+
+        System.out.println("SJF " + format_output(sjf_turnaround/count) + " " + format_output(sjf_reply/count) + " " + format_output(sjf_awaiting/count));
+
+    }
 
 }

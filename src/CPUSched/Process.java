@@ -1,6 +1,8 @@
 package CPUSched;
 
-public class Process {
+import java.lang.Comparable;
+
+public class Process implements Comparable<Process> {
 
 	private int pid;
 	private int submissionTime;
@@ -14,35 +16,51 @@ public class Process {
 		this.submissionTime = submissionTime;
 		this.burstTime = burstTime;
 		
-	} 
+	}
+
+    @Override
+	public int compareTo(Process b) {
+        if (burstTime > b.burstTime)
+            return 1;
+
+        if (burstTime == b.burstTime) {
+            if (submissionTime > b.submissionTime)
+                return 1;
+            if (submissionTime == b.submissionTime)
+                return 0;
+            if (submissionTime < b.submissionTime)
+                return -1;
+        }
+
+        return -1;
+	}
 	
 	public int getPID() {
 		return this.pid;
 	}
 	
-	public int getSubmissionTime(){
+	public int getSubmissionTimestamp(){
 		return this.submissionTime;
 	} 
 	
-	public int getBurstTime(){
+	public int getBurstDuration(){
 		return this.burstTime;
 	}
 	
 	public void decreseBurstTime() {
 		this.burstTime--;
 	}
-	
-	
-	public int getReplyTime(){
+
+	public int getReplyTimestamp(){
 		return this.replyTime;
 	}
 	
-	public void setReplyTime(int replyTime){
+	public void setReplyTimestamp(int replyTime){
 		this.replyTime = replyTime;
 	}
 	
 	public String toString(){
-		return "pid[" + this.pid + "] submissionTime[" + this.submissionTime + "] burstTime[" + this.burstTime + "]";
+		return "\npid[" + this.pid + "] submissionTime[" + this.submissionTime + "] burstTime[" + this.burstTime + "]";
 	}
-	
+
 }
