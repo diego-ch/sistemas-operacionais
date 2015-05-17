@@ -54,6 +54,7 @@ public class Main {
 		// executa os métodos de escalonamento
 		Schedulers.runFCFS(process_list);
         Schedulers.runSJF(process_list);
+		Schedulers.runRR(process_list);
 
         LOGGER.log(Level.FINE, "cpusched: closing");
 		System.exit(0);

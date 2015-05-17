@@ -34,7 +34,8 @@ public class Process implements Comparable<Process> {
 
         return -1;
 	}
-	
+
+
 	public int getPID() {
 		return this.pid;
 	}
@@ -47,7 +48,7 @@ public class Process implements Comparable<Process> {
 		return this.burstTime;
 	}
 	
-	public void decreseBurstTime() {
+	public void decreaseBurstDuration() {
 		this.burstTime--;
 	}
 
