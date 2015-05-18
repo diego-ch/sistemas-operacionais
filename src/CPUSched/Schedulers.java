@@ -1,10 +1,8 @@
 package CPUSched;
 
+import java.lang.reflect.Array;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.ListIterator;
-import java.util.Locale;
+import java.util.*;
 
 public class Schedulers {
 
@@ -88,55 +86,83 @@ public class Schedulers {
     public static void runSJF(ArrayList<Process> process_list) {
 
         int clock = -1;
-        int count = 0;
+        int count =  0;
 
         double sjf_turnaround = 0;
         double sjf_reply      = 0;
         double sjf_awaiting   = 0;
 
-        ArrayList<Process> processesSortedByDuration = new ArrayList<Process>();
-        processesSortedByDuration.addAll(process_list);
-        Process process = processesSortedByDuration.get(1);
-
         while (true) {
 
             clock++;
 
-            if (debug_sjf) { System.out.println("\nclock: " + clock + " count: " + count + "\nordered_list " + processesSortedByDuration.toString()); }
+            if (debug_sjf) {
+                System.out.println("\nclock: " + clock + " count: " + count);
+            }
+
+            Process process;
+            ArrayList<Process> processListSorted = new ArrayList<Process>();
+            ListIterator<Process> iter = process_list.listIterator();
+
+
+            if (debug_sjf) {System.out.println("Begin Sort");}
+            while (iter.hasNext()) {
+                Process p;
+                p = iter.next();
+                if (p.getSubmissionTimestamp() <= clock && !p.getExecuted()) {
+                    if (debug_sjf) {System.out.println("\tadding process: " + p.toString());}
+                    processListSorted.add(p);
+                }
+            }
+
+            Collections.sort(processListSorted);
+            if (debug_sjf) { System.out.println("\tslist: " + processListSorted);
+            System.out.println("End Sort"); }
 
             // wait until clock reaches the first process in the list
-            if (process.getSubmissionTimestamp() > clock) {
+            if (processListSorted.isEmpty()) {
                 if (debug_sjf) { System.out.println("cpusched: waiting processes"); }
                 continue;
+            } else {
+                process = processListSorted.get(0);
             }
 
             process.setReplyTimestamp(clock);
             if (debug_sjf) { System.out.println("cpusched: run process [" + process.getPID() + "] from [" + clock + "] until [" + (clock + process.getBurstDuration() - 1) + "]"); }
+            for (Process p : process_list) {
+                if (p.getPID() == process.getPID()) {
+                    if (debug_sjf) {  System.out.println("\tset executed: " + p.toString()); }
+                    p.setExecuted(true);
+                }
+            }
             clock += process.getBurstDuration()-1;
 
             // write process turnaround, reply and awaiting times
-            sjf_turnaround += clock - process.getSubmissionTimestamp()+1;
+            sjf_turnaround += clock - process.getSubmissionTimestamp() + 1;
             sjf_reply      += process.getReplyTimestamp() - process.getSubmissionTimestamp();
             sjf_awaiting   += process.getReplyTimestamp() - process.getSubmissionTimestamp();
 
             if (debug_sjf) {
-                System.out.println("\n\tprocess_submission: " + process.getSubmissionTimestamp() + "\t\t process_burst: " + process.getBurstDuration()
-                    + "\n\ttotal_turnaround: " + sjf_turnaround + "\t\t process_turnaround: " + (clock - process.getSubmissionTimestamp() + 1)
-                    + "\n\ttotal_reply: " + sjf_reply + "\t\t process_reply: " + (process.getReplyTimestamp() - process.getSubmissionTimestamp())
-                    + "\n\ttotal_awaiting: " + sjf_awaiting + "\t\t process_awaiting: " + (process.getReplyTimestamp() - process.getSubmissionTimestamp()));
+                System.out.println("\tprocess_submission: " + process.getSubmissionTimestamp() + "\t\t process_burst: " + process.getBurstDuration()
+                        + "\n\ttotal_turnaround: " + sjf_turnaround + "\t\t process_turnaround: " + (clock - process.getSubmissionTimestamp() + 1)
+                        + "\n\ttotal_reply: " + sjf_reply + "\t\t process_reply: " + (process.getReplyTimestamp() - process.getSubmissionTimestamp())
+                        + "\n\ttotal_awaiting: " + sjf_awaiting + "\t\t process_awaiting: " + (process.getReplyTimestamp() - process.getSubmissionTimestamp()));
             }
 
             count++;
 
-            processesSortedByDuration.remove(0);
-            if (processesSortedByDuration.isEmpty())
+            int total_list=0;
+            for (Process p : process_list) {
+                if (p.getExecuted())
+                    total_list++;
+            }
+
+            if (total_list == process_list.size())
                 break;
 
-            Collections.sort(processesSortedByDuration);
-            process = processesSortedByDuration.get(0);
         }
+
         System.out.println("SJF " + format_output(sjf_turnaround/count) + " " + format_output(sjf_reply/count) + " " + format_output(sjf_awaiting/count));
     }
-    
 
 }

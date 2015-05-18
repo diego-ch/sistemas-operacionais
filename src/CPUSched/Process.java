@@ -6,24 +6,25 @@ public class Process implements Comparable<Process> {
 
 	private int pid;
 	private int submissionTime;
-	private int burstTime;
+	private int burstDuration;
 	private int replyTime;
-	
+	private boolean executed;
 	
 	public Process (int pid, int submissionTime, int burstTime){
 		
 		this.pid = pid;
 		this.submissionTime = submissionTime;
-		this.burstTime = burstTime;
-		
+		this.burstDuration = burstTime;
+		this.executed = false;
 	}
 
     @Override
 	public int compareTo(Process b) {
-        if (burstTime > b.burstTime)
+
+        if (burstDuration > b.burstDuration)
             return 1;
 
-        if (burstTime == b.burstTime) {
+        if (burstDuration == b.burstDuration) {
             if (submissionTime > b.submissionTime)
                 return 1;
             if (submissionTime == b.submissionTime)
@@ -36,6 +37,10 @@ public class Process implements Comparable<Process> {
 	}
 
 
+    public boolean getExecuted() { return this.executed; }
+
+    public void setExecuted(boolean executed) { this.executed = executed; }
+
 	public int getPID() {
 		return this.pid;
 	}
@@ -45,12 +50,10 @@ public class Process implements Comparable<Process> {
 	} 
 	
 	public int getBurstDuration(){
-		return this.burstTime;
+		return this.burstDuration;
 	}
 	
-	public void decreaseBurstDuration() {
-		this.burstTime--;
-	}
+	public void decreaseBurstDuration() { this.burstDuration--;	}
 
 	public int getReplyTimestamp(){
 		return this.replyTime;
@@ -60,8 +63,6 @@ public class Process implements Comparable<Process> {
 		this.replyTime = replyTime;
 	}
 	
-	public String toString(){
-		return "\npid[" + this.pid + "] submissionTime[" + this.submissionTime + "] burstTime[" + this.burstTime + "]";
-	}
+	public String toString() { return "pid(" + this.pid + ") submissionTime(" + this.submissionTime + ") burstDuration(" + this.burstDuration + ") executed(" + this.executed +")"; }
 
 }
