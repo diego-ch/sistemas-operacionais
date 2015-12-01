@@ -3,20 +3,89 @@ package PageRep;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+class Frame {
+
+	int id;
+	int age;
+
+	public Frame(int id, int time) {
+		this.id		= id;
+		this.age	= time;
+	}
+
+	public String toString() {
+		return Integer.toString(this.id);
+	}
+
+}
+
 public class LRU {
 
-	public static void run(ArrayList<String> list){
+	public static void run(int frame_size, ArrayList<Integer> list_lru){
+
+		int hit		= 0;
+		int fault 	= 0;
+		int timer	= 0;
+
+		Frame frames[]	= new Frame[frame_size];
+		int	selected_frame  = 0;
 		
-		// clonando a lista
-		@SuppressWarnings("unchecked")
-		ArrayList<String> listLRU = (ArrayList<String>) list.clone();
+		// inicializa os frames com valor nulo;
+		for (int i=0; i < frames.length; i++)
+			frames[i] = new Frame(-1,-1);
 		
-		// o primeiro elemento da lista é o numero de quadros de memória disponíveis na RAM
-		// removemos ele da lista e deixamos somente as referências as páginas.
-		int quadros = Integer.parseInt(listLRU.remove(0));
+		// percorre a lista de entrada
+		for (int item : list_lru) {
+
+			timer++;
+
+			Frame page = new Frame(item, timer);
+			boolean insert = true;
+
+			// compara o elemento a ser inserido com os que estão no quadro de memória
+			// se o elemento já estiver na lista (hit), saltar para o próximo elemento da entrada
+			for (int i = 0; i < frames.length; i++) {
+				if (page.id == frames[i].id) {
+					frames[i].age = timer;
+					insert = false;
+					hit++;
+					break;
+				}
+			}	
+
+			// caso o elemento não se encontre no quadro de memória (fault)
+			// devemos inseri-lo na proxima posição vazia
+			if (insert) {
+
+				for (int i = 0; i < frames.length; i++) {
+					if (frames[i].id == -1) {
+						frames[i] = page;
+						insert = false;
+						fault++;
+						break;
+					}
+				}
+			}
+
+			// caso todos os frames estejam ocupados (fault)
+			// devemos substituir o elemento menos recentemente utilizado
+			if (insert) {
+				int aux = 0;
+				for (int i = 0; i < frames.length; i++) {
+					if (frames[i].age < frames[aux].age)
+						aux = i;
+				}
+
+				frames[aux] = page;
+				fault++;
+			}
+
+
+			// exibir saida a cada iteração
+			//System.out.println(timer + "\t" + Arrays.toString(frames));
+		}
 		
-		
-		System.out.println("LRU "  + quadros + " " + Arrays.toString(listLRU.toArray()));
-	}
-	
+		System.out.println("LRU " + fault);
+
+	}	
 }
