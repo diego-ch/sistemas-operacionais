@@ -3,22 +3,6 @@ package PageRep;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-class Frame {
-
-	int id;
-	int age;
-
-	public Frame(int id, int time) {
-		this.id		= id;
-		this.age	= time;
-	}
-
-	public String toString() {
-		return Integer.toString(this.id);
-	}
-
-}
-
 public class LRU {
 
 	public static void run(int frame_size, ArrayList<Integer> list_lru){

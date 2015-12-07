@@ -1,3 +1,5 @@
+package PageRep;
+
 public class Frame {
 
 	int id;
