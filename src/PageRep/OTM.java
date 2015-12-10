@@ -30,7 +30,6 @@ public class OTM {
 			// se o elemento já estiver na lista (hit), saltar para o próximo elemento da entrada
 			for (int i = 0; i < frames.length; i++) {
 				if (page.id == frames[i].id) {
-					System.out.print("hit\t");
 					frames[i].age = timer;
 					insert = false;
 					hit++;
@@ -44,7 +43,6 @@ public class OTM {
 
 				for (int i = 0; i < frames.length; i++) {
 					if (frames[i].id == -1) {
-						System.out.print("empty\t");
 						frames[i] = page;
 						insert = false;
 						fault++;
@@ -60,54 +58,54 @@ public class OTM {
 				int count = 0;
 				int	selected_frame  = 0;
 
-				System.out.print("full");
-
-
+				// limpa flags
+				for (int i=0; i < frames.length; i++)
+					frames[i].flag = -1;
+				
+				// marca os elementos da lista de acordo com o tempo de chamada
 				for (int entry : list_otm) {
 
-					if (count >= timer && count < list_otm.size()) {
-
-
-						System.out.println("\t\tpage="				+ page.id
-											+ "  selected_frame="	+ selected_frame 
-											+ "  value="			+ list_otm.get(count)
-											+ "  count="			+ count);
-
+					if (count >= timer && count < list_otm.size()){
+						
 						for (int i = 0; i < frames.length; i++) {
-							
-							if (frames[i].id == list_otm.get(count)) {
-									//System.out.println("\t\t\tframes["+ i +"]=" + frames[i].id
-									//						+ " list=" + list_otm.get(count));
-									frames[i].found = true;
-									selected_frame = i;
-								}
-
+							if (frames[i].id == entry && frames[i].flag == -1) {
+								frames[i].flag = count+1;
+							}
 						}
-
 					}
-
+					
 					count++;
+					
 				}
-
-				System.out.print("\t\tpage=" + page.id
-								+ "\tlfu=" + frames[selected_frame] + "\tpos=" + selected_frame + "\n\t");
-
-				if (timer == list_otm.size()) {
-					for (int i = 0; i < frames.length; i++) {
-						if (frames[i].age < frames[selected_frame].age)
-							selected_frame = i;
+				
+				// seleciona o elemento da lista que ira levar menos tempo a ser chamado
+				for (int i = 0; i < frames.length; i++) {
+					
+					if (frames[i].flag == -1) {
+						selected_frame = i;
+						break;
 					}
+					
+					if (frames[i].flag >= frames[selected_frame].flag){
+						selected_frame = i;
+					}
+					
 				}
+					
+				/* System.out.print("\t\tpage=" + page.id
+									+ " selected_frame=" + selected_frame
+									+ " frame_flag=" + frames[selected_frame].flag 
+									+ " frame_value=" + frames[selected_frame].id + "\n\n\t"); */
 
+				// faz a substituição de pagina
 				frames[selected_frame] = page;
 				fault++;
 			}
 
 			// exibir saida a cada iteração
-			System.out.println("" + timer + "\t" + Arrays.toString(frames) + "");
+			//System.out.println("" + timer + "\t" + Arrays.toString(frames) + "");
 		}
 		
 		System.out.println("OTM " + fault);
-
-	}	
+	}
 }
