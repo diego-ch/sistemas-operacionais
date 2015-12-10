@@ -1,15 +1,14 @@
 package PageRep;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class FIFO {
 	
 	public static void run(int frame_size, ArrayList<Integer> list_fifo){
 
 		int timer			= 0;
-
 		int fault 			= 0;
+		int hit				= 0;
 		int frames[]		= new int[frame_size];
 		int selected_frame  = 0;
 		
@@ -33,6 +32,7 @@ public class FIFO {
 			for (int i = 0; i < frames.length; i++) {
 				if (page == frames[i]){
 					insert = false;
+					hit++;
 					break;
 				}
 			}	

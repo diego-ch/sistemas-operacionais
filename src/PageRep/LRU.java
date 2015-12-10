@@ -1,7 +1,6 @@
 package PageRep;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class LRU {
 
@@ -54,13 +53,13 @@ public class LRU {
 			// caso todos os frames estejam ocupados (fault)
 			// devemos substituir o elemento menos recentemente utilizado
 			if (insert) {
-				int aux = 0;
+				selected_frame = 0;
 				for (int i = 0; i < frames.length; i++) {
-					if (frames[i].age < frames[aux].age)
-						aux = i;
+					if (frames[i].age < frames[selected_frame].age)
+						selected_frame = i;
 				}
 
-				frames[aux] = page;
+				frames[selected_frame] = page;
 				fault++;
 			}
 
